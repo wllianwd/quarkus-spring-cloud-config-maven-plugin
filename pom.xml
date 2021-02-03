@@ -2,20 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.willianwd</groupId>
     <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
+    <groupId>io.github.willianwd</groupId>
+    <version>1.0.9-SNAPSHOT</version>
+
     <name>Quarkus Spring Cloud Config Maven Plugin</name>
     <description>This plugin fetch properties from Spring Cloud Config to be used during build time</description>
     <url>https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin</url>
-
     <packaging>maven-plugin</packaging>
-    <version>1.0.4</version>
 
     <scm>
         <connection>scm:git:https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin.git</connection>
         <developerConnection>scm:git:ssh://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin.git</developerConnection>
         <url>https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin</url>
-        <tag>quarkus-spring-cloud-config-maven-plugin-1.0.4</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <licenses>
@@ -57,7 +57,6 @@
         <snakeyaml.version>1.21</snakeyaml.version>
         <junit.version>4.13.1</junit.version>
 
-        <maven-plugin-api.version>3.6.3</maven-plugin-api.version>
         <maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
         <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
         <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
@@ -65,6 +64,8 @@
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
     </properties>
 
     <dependencies>
@@ -109,12 +110,13 @@
         <dependency>
             <groupId>org.apache.maven.plugin-testing</groupId>
             <artifactId>maven-plugin-testing-harness</artifactId>
-            <version>3.3.0</version>
+            <version>${maven-plugin-testing-harness.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
+
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -166,6 +168,15 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven-release-plugin.version}</version>
+                    <configuration>
+                        <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>${maven-gpg-plugin.version}</version>
                     <executions>
@@ -177,9 +188,16 @@
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <gpgArguments>
+                            <arg>--pinentry-mode</arg>
+                            <arg>loopback</arg>
+                        </gpgArguments>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -191,14 +209,28 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <artifactId>maven-release-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <reporting>
         <plugins>

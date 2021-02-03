@@ -11,12 +11,11 @@
             <plugin>
                 <groupId>io.quarkus.willianwd</groupId>
                 <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
-                <version>1.0.4</version>
+                <version>1.0.5</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>fetch-properties</goal>
-                            <goal>fetch-test-properties</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -26,8 +25,6 @@
                     <bootstrapFile>bootstrap.yml</bootstrapFile>
                     <targetDirectory>target/classes/</targetDirectory>
                     <targetFile>application1.properties</targetFile>
-                    <targetTestDirectory>target/classes/</targetTestDirectory>
-                    <targetTestFile>application1-test.properties</targetTestFile>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,5 +1,8 @@
 # Quarkus Spring Cloud Config Maven Plugin
 
+![Maven Central](https://img.shields.io/maven-central/v/io.github.willianwd/quarkus-spring-cloud-config-maven-plugin?logo=apache-maven&style=for-the-badge)
+![Release CI](https://img.shields.io/github/workflow/status/wllianwd/quarkus-spring-cloud-config-maven-plugin/ci-release?style=for-the-badge)
+
 In a nutshell this maven plugin will download the properties from Spring Cloud Config and generate an `application.properties` file
  inside `src/main/resources`, so this file can be used during build phase.
 
@@ -12,12 +15,11 @@ Add the maven plugin in your build, like below:
         <plugin>
             <groupId>io.github.willianwd</groupId>
             <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
-            <version>1.0.4</version>
+            <version>${version}</version>
             <executions>
                 <execution>
                     <goals>
                         <goal>fetch-properties</goal>
-                        <goal>fetch-test-properties</goal>
                     </goals>
                 </execution>
             </executions>
@@ -50,12 +52,11 @@ You can change the default file locations by specifying the properties, as shown
         <plugin>
             <groupId>io.quarkus.willianwd</groupId>
             <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
-            <version>1.0.4</version>
+            <version>${version}</version>
             <executions>
                 <execution>
                     <goals>
                         <goal>fetch-properties</goal>
-                        <goal>fetch-test-properties</goal>
                     </goals>
                 </execution>
             </executions>
@@ -65,8 +66,6 @@ You can change the default file locations by specifying the properties, as shown
                 <bootstrapFile>bootstrap.yml</bootstrapFile>
                 <targetDirectory>target/classes/</targetDirectory>
                 <targetFile>application.properties</targetFile>
-                <targetTestDirectory>target/classes/</targetTestDirectory>
-                <targetTestFile>application.properties</targetTestFile>
             </configuration>
         </plugin>
     </plugins>
