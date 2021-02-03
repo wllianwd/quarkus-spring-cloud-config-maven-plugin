@@ -4,10 +4,10 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-@Mojo(name = "fetch-properties", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
-public class SpringCloudConfigPropertiesMojo extends AbstractSpringCloudConfigPropertiesMojo {
+@Mojo(name = "fetch-test-properties", defaultPhase = LifecyclePhase.GENERATE_TEST_RESOURCES)
+public class TestSpringCloudConfigPropertiesMojo extends AbstractSpringCloudConfigPropertiesMojo {
 
-    @Parameter(property = "bootstrapDirectory", defaultValue = "src/main/resources/")
+    @Parameter(property = "bootstrapTestDirectory", defaultValue = "src/test/resources/")
     private String bootstrapDirectory;
 
     @Override
