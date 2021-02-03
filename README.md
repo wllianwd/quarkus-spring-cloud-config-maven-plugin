@@ -12,11 +12,12 @@ Add the maven plugin in your build, like below:
         <plugin>
             <groupId>io.github.willianwd</groupId>
             <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
             <executions>
                 <execution>
                     <goals>
                         <goal>fetch-properties</goal>
+                        <goal>fetch-test-properties</goal>
                     </goals>
                 </execution>
             </executions>
@@ -49,19 +50,23 @@ You can change the default file locations by specifying the properties, as shown
         <plugin>
             <groupId>io.quarkus.willianwd</groupId>
             <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
             <executions>
                 <execution>
                     <goals>
                         <goal>fetch-properties</goal>
+                        <goal>fetch-test-properties</goal>
                     </goals>
                 </execution>
             </executions>
             <configuration>
                 <bootstrapDirectory>src/main/resources/</bootstrapDirectory>
+                <bootstrapTestDirectory>src/test/resources/</bootstrapTestDirectory>
                 <bootstrapFile>bootstrap.yml</bootstrapFile>
                 <targetDirectory>target/classes/</targetDirectory>
                 <targetFile>application.properties</targetFile>
+                <targetTestDirectory>target/classes/</targetTestDirectory>
+                <targetTestFile>application.properties</targetTestFile>
             </configuration>
         </plugin>
     </plugins>

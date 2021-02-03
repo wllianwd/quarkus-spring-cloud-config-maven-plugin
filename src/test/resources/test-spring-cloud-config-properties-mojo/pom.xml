@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.willianwd</groupId>
+    <artifactId>quarkus-spring-cloud-config-maven-plugin-test1</artifactId>
+    <name>Quarkus Spring Cloud Config Maven Plugin Test1</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.quarkus.willianwd</groupId>
+                <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
+                <version>1.0.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>fetch-properties</goal>
+                            <goal>fetch-test-properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <bootstrapDirectory>src/main/resources/</bootstrapDirectory>
+                    <bootstrapTestDirectory>src/test/resources/</bootstrapTestDirectory>
+                    <bootstrapFile>bootstrap.yml</bootstrapFile>
+                    <targetDirectory>target/classes/</targetDirectory>
+                    <targetFile>application2.properties</targetFile>
+                    <targetTestDirectory>target/classes/</targetTestDirectory>
+                    <targetTestFile>application2-test.properties</targetTestFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
