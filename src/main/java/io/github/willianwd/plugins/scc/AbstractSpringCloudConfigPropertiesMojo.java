@@ -22,14 +22,26 @@ import org.yaml.snakeyaml.Yaml;
 public abstract class AbstractSpringCloudConfigPropertiesMojo extends AbstractMojo
 {
 
-    @Parameter(property = "bootstrapFile", defaultValue = "bootstrap.yml")
-    protected String bootstrapFile;
+    @Parameter(property = "bootstrapDirectory", defaultValue = "src/main/resources/")
+    protected String bootstrapDirectory;
 
     @Parameter(property = "targetDirectory", defaultValue = "target/classes/")
     protected String targetDirectory;
 
     @Parameter(property = "targetFile", defaultValue = "application.properties")
     protected String targetFile;
+
+    @Parameter(property = "bootstrapFile", defaultValue = "bootstrap.yml")
+    protected String bootstrapFile;
+
+    @Parameter(property = "bootstrapTestDirectory", defaultValue = "src/test/resources/")
+    protected String bootstrapTestDirectory;
+
+    @Parameter(property = "targetTestDirectory", defaultValue = "target/classes/")
+    protected String targetTestDirectory;
+
+    @Parameter(property = "targetTestFile", defaultValue = "application.properties")
+    protected String targetTestFile;
 
     protected static final String SKIP_QUARKUS_SCCMP = "SKIP_QUARKUS_SCCMP";
     protected static final String URL_TEMPLATE = "%s/%s/%s-all.properties";
@@ -51,7 +63,8 @@ public abstract class AbstractSpringCloudConfigPropertiesMojo extends AbstractMo
     {
         try
         {
-            if (!isSkipEnabled()) {
+            if (!isSkipEnabled())
+            {
                 final File projectYamlBootstrap = getBootstrapFile();
                 if (projectYamlBootstrap.exists())
                 {
@@ -63,7 +76,7 @@ public abstract class AbstractSpringCloudConfigPropertiesMojo extends AbstractMo
 
                     if (sccEnabled)
                     {
-                        final File targetClasses = new File(targetDirectory);
+                        final File targetClasses = new File(getTargetDirectory());
                         if (!targetClasses.exists())
                         {
                             final boolean targetGenerated = targetClasses.mkdirs();
@@ -71,17 +84,17 @@ public abstract class AbstractSpringCloudConfigPropertiesMojo extends AbstractMo
                         }
 
                         final String sccUrl = String.format(
-                                URL_TEMPLATE,
-                                getPropertyOrError(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY),
-                                getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY, SPRING_CLOUD_CONFIG_DEFAULT_LABEL),
-                                getApplicationName(yamlProperties)
+                            URL_TEMPLATE,
+                            getPropertyOrError(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY),
+                            getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY, SPRING_CLOUD_CONFIG_DEFAULT_LABEL),
+                            getApplicationName(yamlProperties)
                         );
 
                         getLog().info("Getting properties from Spring Cloud Config under URL [" + sccUrl + "]");
                         final HttpRequest request = HttpRequest.newBuilder()
-                                .GET()
-                                .uri(URI.create(sccUrl))
-                                .build();
+                            .GET()
+                            .uri(URI.create(sccUrl))
+                            .build();
                         final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
                         final Properties appProps = new Properties();
@@ -90,9 +103,9 @@ public abstract class AbstractSpringCloudConfigPropertiesMojo extends AbstractMo
                         appProps.putIfAbsent(SPRING_CLOUD_CONFIG_URL_KEY, getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
                         appProps.putIfAbsent(SPRING_CLOUD_CONFIG_ENABLED_KEY, String.valueOf(sccEnabled));
 
-                        getLog().info("Writing properties from Spring Cloud Config into local file [" + targetDirectory + targetFile + "]");
+                        getLog().info("Writing properties from Spring Cloud Config into local file [" + getTargetDirectory() + getTargetFile() + "]");
 
-                        appProps.store(new FileWriter(targetDirectory + targetFile), "Properties read from Spring Cloud Config [" + sccUrl + "] and written locally");
+                        appProps.store(new FileWriter(getTargetDirectory() + getTargetFile() ), "Properties read from Spring Cloud Config [" + sccUrl + "] and written locally");
                     }
                     else
                     {
@@ -103,7 +116,9 @@ public abstract class AbstractSpringCloudConfigPropertiesMojo extends AbstractMo
                 {
                     getLog().info("Ignoring properties from Spring Cloud Config properties as config file was not found in path");
                 }
-            } else {
+            }
+            else
+            {
                 getLog().info("Ignoring plugin as property " + SKIP_QUARKUS_SCCMP + "is enabled");
             }
         }
@@ -115,6 +130,10 @@ public abstract class AbstractSpringCloudConfigPropertiesMojo extends AbstractMo
 
 
     protected abstract String getBootstrapPath();
+
+    protected abstract String getTargetDirectory();
+
+    protected abstract String getTargetFile();
 
 
     private File getBootstrapFile()

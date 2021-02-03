@@ -61,10 +61,12 @@ You can change the default file locations by specifying the properties, as shown
             </executions>
             <configuration>
                 <bootstrapDirectory>src/main/resources/</bootstrapDirectory>
-                <bootstrapTestDirectory>src/test/resources/</bootstrapDirectory>
+                <bootstrapTestDirectory>src/test/resources/</bootstrapTestDirectory>
                 <bootstrapFile>bootstrap.yml</bootstrapFile>
                 <targetDirectory>target/classes/</targetDirectory>
                 <targetFile>application.properties</targetFile>
+                <targetTestDirectory>target/classes/</targetTestDirectory>
+                <targetTestFile>application.properties</targetTestFile>
             </configuration>
         </plugin>
     </plugins>
