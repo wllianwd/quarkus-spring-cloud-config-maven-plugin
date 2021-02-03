@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.willianwd</groupId>
@@ -10,13 +9,13 @@
     <url>https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin</url>
 
     <packaging>maven-plugin</packaging>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
 
     <scm>
         <connection>scm:git:https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin.git</connection>
         <developerConnection>scm:git:ssh://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin.git</developerConnection>
         <url>https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin</url>
-        <tag>HEAD</tag>
+        <tag>quarkus-spring-cloud-config-maven-plugin-1.0.4</tag>
     </scm>
 
     <licenses>
