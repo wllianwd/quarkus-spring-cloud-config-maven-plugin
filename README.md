@@ -10,22 +10,27 @@ In a nutshell this maven plugin will download the properties from Spring Cloud C
 
 Add the maven plugin in your build, like below:
 ```
-<build>
-    <plugins>
-        <plugin>
-            <groupId>io.github.willianwd</groupId>
-            <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
-            <version>${version}</version>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>fetch-properties</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
-</build> 
+<profiles>
+    <profile>
+        <id>quarkus-sccmp<id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>io.github.willianwd</groupId>
+                    <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
+                    <version>${version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>fetch-properties</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </build>
+    <profile>
+</profiles>
 ```
 Create a `bootstrap.yml` in your `src/main/resources`, like below:
 ```
@@ -61,8 +66,8 @@ You can change the default file locations by specifying the properties, as shown
                 </execution>
             </executions>
             <configuration>
+                <skip>false</skip>
                 <bootstrapDirectory>src/main/resources/</bootstrapDirectory>
-                <bootstrapTestDirectory>src/test/resources/</bootstrapTestDirectory>
                 <bootstrapFile>bootstrap.yml</bootstrapFile>
                 <targetDirectory>target/classes/</targetDirectory>
                 <targetFile>application.properties</targetFile>
@@ -78,7 +83,22 @@ For that, please use the official [spring cloud config client](https://quarkus.i
 
 ## How to skip the plugin
 
-If you want to skip this plugin from the command line, you can use the property `SKIP_QUARKUS_SCCMP=true`:
+You can skip using the plugin configuration:
+```
+<build>
+    <plugins>
+        <plugin>
+            <groupId>io.quarkus.willianwd</groupId>
+            <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
+            <version>${version}</version>
+            <configuration>
+                <skip>true</skip>
+            </configuration>
+        </plugin>
+    </plugins>
+</build> 
+```
+Or you can use the property `SKIP_QUARKUS_SCCMP=true`:
 ```
 mvn clean verify -DSKIP_QUARKUS_SCCMP=true
 ```

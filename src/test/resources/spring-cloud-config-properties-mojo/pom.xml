@@ -11,7 +11,7 @@
             <plugin>
                 <groupId>io.quarkus.willianwd</groupId>
                 <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
-                <version>1.0.5</version>
+                <version>1.0.9</version>
                 <executions>
                     <execution>
                         <goals>
@@ -21,7 +21,6 @@
                 </executions>
                 <configuration>
                     <bootstrapDirectory>src/main/resources/</bootstrapDirectory>
-                    <bootstrapTestDirectory>src/test/resources/</bootstrapTestDirectory>
                     <bootstrapFile>bootstrap.yml</bootstrapFile>
                     <targetDirectory>target/classes/</targetDirectory>
                     <targetFile>application1.properties</targetFile>

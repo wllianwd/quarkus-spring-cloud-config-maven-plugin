@@ -25,11 +25,11 @@ import org.yaml.snakeyaml.Yaml;
 public class SpringCloudConfigPropertiesMojo extends AbstractMojo
 {
 
+    @Parameter(property = "skip")
+    protected boolean skip = false;
+
     @Parameter(property = "bootstrapDirectory", defaultValue = "src/main/resources/")
     protected String bootstrapDirectory;
-
-    @Parameter(property = "bootstrapTestDirectory", defaultValue = "src/test/resources/")
-    protected String bootstrapTestDirectory;
 
     @Parameter(property = "targetDirectory", defaultValue = "target/classes/")
     protected String targetDirectory;
@@ -49,87 +49,103 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
     private static final String SPRING_CLOUD_CONFIG_URL_KEY = "quarkus.spring-cloud-config.url";
     private static final String SPRING_CLOUD_CONFIG_ENABLED_KEY = "quarkus.spring-cloud-config.enabled";
     private static final String SPRING_CLOUD_CONFIG_DEFAULT_LABEL = "master";
-
     private final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
 
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        try
+        if (!shouldSkip())
         {
-            final File projectYamlBootstrap = getBootstrapFile();
-            if (projectYamlBootstrap.exists())
+            try
             {
-                final Yaml yaml = new Yaml();
-                final InputStream inputStream = new FileInputStream(projectYamlBootstrap);
-                final Map<String, Object> yamlProperties = yaml.load(inputStream);
-
-                final boolean sccEnabled = (Boolean) getPropertyOrNull(yamlProperties, SPRING_CLOUD_CONFIG_ENABLED_KEY);
-
-                if (sccEnabled)
+                final File projectYamlBootstrap = getBootstrapFile();
+                if (projectYamlBootstrap.exists())
                 {
-                    final File targetClasses = new File(targetDirectory);
-                    if (!targetClasses.exists())
+                    final Yaml yaml = new Yaml();
+                    final InputStream inputStream = new FileInputStream(projectYamlBootstrap);
+                    final Map<String, Object> yamlProperties = yaml.load(inputStream);
+
+                    final boolean sccEnabled = (Boolean) getPropertyOrNull(yamlProperties, SPRING_CLOUD_CONFIG_ENABLED_KEY);
+
+                    if (sccEnabled)
                     {
-                        final boolean targetGenerated = targetClasses.mkdirs();
-                        getLog().info("Default target/classes directory generated [" + targetGenerated + "]");
+                        final File targetClasses = new File(targetDirectory);
+                        if (!targetClasses.exists())
+                        {
+                            final boolean targetGenerated = targetClasses.mkdirs();
+                            getLog().info("Default target/classes directory generated [" + targetGenerated + "]");
+                        }
+
+                        final String sccUrl = String.format(
+                            URL_TEMPLATE,
+                            getPropertyOrError(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY),
+                            getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY, SPRING_CLOUD_CONFIG_DEFAULT_LABEL),
+                            getApplicationName(yamlProperties)
+                        );
+
+                        getLog().info("Getting properties from Spring Cloud Config under URL [" + sccUrl + "]");
+                        final HttpRequest request = HttpRequest.newBuilder()
+                            .GET()
+                            .uri(URI.create(sccUrl))
+                            .build();
+                        final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                        final Properties appProps = new Properties();
+                        appProps.load(new StringReader(response.body()));
+                        appProps.putIfAbsent(APPLICATION_NAME_KEY_2, getPropertyOrDefault(yamlProperties, APPLICATION_NAME_KEY_2, ""));
+                        appProps.putIfAbsent(SPRING_CLOUD_CONFIG_URL_KEY, getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
+                        appProps.putIfAbsent(SPRING_CLOUD_CONFIG_ENABLED_KEY, String.valueOf(sccEnabled));
+
+                        getLog().info("Writing properties from Spring Cloud Config into local file [" + targetDirectory + targetFile + "]");
+
+                        appProps.store(new FileWriter(targetDirectory + targetFile), "Properties read from Spring Cloud Config [" + sccUrl + "] and written locally");
                     }
-
-                    final String sccUrl = String.format(
-                        URL_TEMPLATE,
-                        getPropertyOrError(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY),
-                        getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY, SPRING_CLOUD_CONFIG_DEFAULT_LABEL),
-                        getApplicationName(yamlProperties)
-                    );
-
-                    getLog().info("Getting properties from Spring Cloud Config under URL [" + sccUrl + "]");
-                    final HttpRequest request = HttpRequest.newBuilder()
-                        .GET()
-                        .uri(URI.create(sccUrl))
-                        .build();
-                    final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                    final Properties appProps = new Properties();
-                    appProps.load(new StringReader(response.body()));
-                    appProps.putIfAbsent(APPLICATION_NAME_KEY_2, getPropertyOrDefault(yamlProperties, APPLICATION_NAME_KEY_2, ""));
-                    appProps.putIfAbsent(SPRING_CLOUD_CONFIG_URL_KEY, getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
-                    appProps.putIfAbsent(SPRING_CLOUD_CONFIG_ENABLED_KEY, String.valueOf(sccEnabled));
-
-                    getLog().info("Writing properties from Spring Cloud Config into local file [" + targetDirectory + targetFile + "]");
-
-                    appProps.store(new FileWriter(targetDirectory + targetFile), "Properties read from Spring Cloud Config [" + sccUrl + "] and written locally");
+                    else
+                    {
+                        getLog().info("Ignoring properties from Spring Cloud Config properties as property [" + SPRING_CLOUD_CONFIG_ENABLED_KEY + "] is not set to TRUE");
+                    }
                 }
                 else
                 {
-                    getLog().info("Ignoring properties from Spring Cloud Config properties as property [" + SPRING_CLOUD_CONFIG_ENABLED_KEY + "] is not set to TRUE");
+                    getLog().info("Ignoring properties from Spring Cloud Config properties as config file was not found in path");
                 }
-            }
-            else
-            {
-                getLog().info("Ignoring properties from Spring Cloud Config properties as config file was not found in path");
-            }
 
-        }
-        catch (InterruptedException | IOException ex)
-        {
-            getLog().error(ex);
+            }
+            catch (InterruptedException | IOException ex)
+            {
+                getLog().error(ex);
+            }
         }
     }
 
 
     private File getBootstrapFile()
     {
-        final String skip = System.getProperty(SKIP_QUARKUS_SCCMP);
-        if (skip != null && skip.equalsIgnoreCase("true"))
+        return new File(bootstrapDirectory + bootstrapFile);
+    }
+
+
+    private Boolean shouldSkip()
+    {
+        if (skip)
         {
-            getLog().info("Plugin is enabled");
-            return new File(bootstrapTestDirectory + bootstrapFile);
+            getLog().info("Ignoring plugin as property 'skip' is set to true in your plugin configuration");
+            return true;
         }
         else
         {
-            return new File(bootstrapDirectory + bootstrapFile);
+            final String skipArgument = System.getProperty(SKIP_QUARKUS_SCCMP);
+            if (skipArgument != null)
+            {
+                final boolean shouldSkip = Boolean.parseBoolean(skipArgument);
+                if (shouldSkip) {
+                    getLog().info("Ignoring plugin as property '" + SKIP_QUARKUS_SCCMP + "' is set to true in your plugin configuration");
+                    return true;
+                }
+            }
         }
+        return false;
     }
 
 
