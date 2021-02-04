@@ -91,6 +91,11 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
                             .build();
                         final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
+                        if (response.statusCode() != 200)
+                        {
+                            getLog().error("Spring Cloud Config returned status [" + response.statusCode() + "]");
+                        }
+
                         final Properties appProps = new Properties();
                         appProps.load(new StringReader(response.body()));
                         appProps.putIfAbsent(APPLICATION_NAME_KEY_2, getPropertyOrDefault(yamlProperties, APPLICATION_NAME_KEY_2, ""));
@@ -108,7 +113,7 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
                 }
                 else
                 {
-                    getLog().info("Ignoring properties from Spring Cloud Config properties as config file was not found in path");
+                    getLog().info("Ignoring properties from Spring Cloud Config properties as config file [" + projectYamlBootstrap.getPath() + "] was not found");
                 }
 
             }
@@ -139,7 +144,8 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
             if (skipArgument != null)
             {
                 final boolean shouldSkip = Boolean.parseBoolean(skipArgument);
-                if (shouldSkip) {
+                if (shouldSkip)
+                {
                     getLog().info("Ignoring plugin as property '" + SKIP_QUARKUS_SCCMP + "' is set to true in your plugin configuration");
                     return true;
                 }
