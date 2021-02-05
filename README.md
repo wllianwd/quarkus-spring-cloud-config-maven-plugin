@@ -50,6 +50,17 @@ quarkus:
 
 The plugin will read a file named `bootstrap.yml` in the `src/main/resources` directory.
 
+That is it! Now you should be able to use it. Considering you kep inside a profile you can use it like bellow:
+```
+mvn compile quarkus:dev -Pquarkus-sccmp
+```
+When building the native image you can do the same:
+```
+mvn package -Dnative,quarkus-sccmp -Dquarkus.native.container-build=true
+```
+
+## How to configure it
+
 You can change the default file locations by specifying the properties, as shown below:
 ```
 <build>
