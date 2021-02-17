@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -34,14 +33,14 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
     @Parameter(property = "targetDirectory", defaultValue = "target/classes/")
     protected String targetDirectory;
 
-    @Parameter(property = "targetFile", defaultValue = "application.properties")
+    @Parameter(property = "targetFile", defaultValue = "application.yml")
     protected String targetFile;
 
     @Parameter(property = "bootstrapFile", defaultValue = "bootstrap.yml")
     protected String bootstrapFile;
 
     private static final String SKIP_QUARKUS_SCCMP = "SKIP_QUARKUS_SCCMP";
-    private static final String URL_TEMPLATE = "%s/%s/%s-all.properties";
+    private static final String URL_TEMPLATE = "%s/%s/%s-all.yaml";
     private static final String PROPERTY_DELIMITER = ".";
     private static final String APPLICATION_NAME_KEY_1 = "quarkus.spring-cloud-config.name";
     private static final String APPLICATION_NAME_KEY_2 = "quarkus.application.name";
@@ -96,15 +95,28 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
                             getLog().error("Spring Cloud Config returned status [" + response.statusCode() + "]");
                         }
 
-                        final Properties appProps = new Properties();
-                        appProps.load(new StringReader(response.body()));
+                        final Map<String, Object> appProps = yaml.load(response.body());
                         appProps.putIfAbsent(APPLICATION_NAME_KEY_2, getPropertyOrDefault(yamlProperties, APPLICATION_NAME_KEY_2, ""));
                         appProps.putIfAbsent(SPRING_CLOUD_CONFIG_URL_KEY, getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
                         appProps.putIfAbsent(SPRING_CLOUD_CONFIG_ENABLED_KEY, String.valueOf(sccEnabled));
 
                         getLog().info("Writing properties from Spring Cloud Config into local file [" + targetDirectory + targetFile + "]");
 
-                        appProps.store(new FileWriter(targetDirectory + targetFile), "Properties read from Spring Cloud Config [" + sccUrl + "] and written locally");
+                        if (targetFile.endsWith(".properties"))
+                        {
+                            final Properties propertiesOutput = new Properties();
+                            propertiesOutput.putAll(appProps);
+                            propertiesOutput.store(new FileWriter(targetDirectory + targetFile), "Properties read from Spring Cloud Config [" + sccUrl + "] and written locally");
+                        }
+                        else if (targetFile.endsWith(".yml") || targetFile.endsWith(".yaml"))
+                        {
+                            final Yaml yamlOutput = new Yaml();
+                            yamlOutput.dump(appProps, new FileWriter(targetDirectory + targetFile));
+                        }
+                        else
+                        {
+                            getLog().warn("Invalid target file extension [" + targetFile + "]. Allowed [.properties, .yml, .yaml]");
+                        }
                     }
                     else
                     {

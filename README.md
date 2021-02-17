@@ -3,7 +3,7 @@
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.willianwd/quarkus-spring-cloud-config-maven-plugin?logo=apache-maven&style=for-the-badge)
 ![Release CI](https://img.shields.io/github/workflow/status/wllianwd/quarkus-spring-cloud-config-maven-plugin/ci-release?style=for-the-badge)
 
-In a nutshell this maven plugin will download the properties from Spring Cloud Config and generate an `application.properties` file
+In a nutshell this maven plugin will download the properties from Spring Cloud Config and generate an `application.yml` file
  inside `src/main/resources`, so this file can be used during build phase.
 
 ## How to use it
@@ -46,7 +46,7 @@ quarkus:
     # this property is optional and overrides quarkus.application.name
     name: myservice
 ```
-> The properties above will be copied to the target `application.properties`, so you don't need to duplicate it.
+> The properties above will be copied to the target `application.yml`, so you don't need to duplicate it.
 
 The plugin will read a file named `bootstrap.yml` in the `src/main/resources` directory.
 
@@ -81,12 +81,14 @@ You can change the default file locations by specifying the properties, as shown
                 <bootstrapDirectory>src/main/resources/</bootstrapDirectory>
                 <bootstrapFile>bootstrap.yml</bootstrapFile>
                 <targetDirectory>target/classes/</targetDirectory>
-                <targetFile>application.properties</targetFile>
+                <targetFile>application.yml</targetFile>
             </configuration>
         </plugin>
     </plugins>
 </build> 
 ```
+
+> It also supports properties if the `targetFile` is defined as `*.properties`
 
 This plugin will NOT maintain the runtime properties up-to-date.
 
