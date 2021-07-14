@@ -3,8 +3,7 @@
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.willianwd/quarkus-spring-cloud-config-maven-plugin?logo=apache-maven&style=for-the-badge)
 ![Release CI](https://img.shields.io/github/workflow/status/wllianwd/quarkus-spring-cloud-config-maven-plugin/ci-release?style=for-the-badge)
 
-In a nutshell this maven plugin will download the properties from Spring Cloud Config and generate an `application.yml` file
- inside `src/main/resources`, so this file can be used during build phase.
+In a nutshell this maven plugin will download the properties from Spring Cloud Config and generate an `application.yml` file inside `src/main/resources`, so this file can be used during build phase.
 
 ## How to use it
 
@@ -66,7 +65,7 @@ You can change the default file locations by specifying the properties, as shown
 <build>
     <plugins>
         <plugin>
-            <groupId>io.quarkus.willianwd</groupId>
+            <groupId>io.github.willianwd</groupId>
             <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
             <version>${version}</version>
             <executions>
@@ -101,7 +100,7 @@ You can skip using the plugin configuration:
 <build>
     <plugins>
         <plugin>
-            <groupId>io.quarkus.willianwd</groupId>
+            <groupId>io.github.willianwd</groupId>
             <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
             <version>${version}</version>
             <configuration>

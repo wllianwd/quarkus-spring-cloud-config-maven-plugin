@@ -54,7 +54,7 @@
 
         <maven.version>3.3.9</maven.version>
         <maven-project.version>2.2.1</maven-project.version>
-        <snakeyaml.version>1.21</snakeyaml.version>
+        <snakeyaml.version>1.29</snakeyaml.version>
         <junit.version>4.13.1</junit.version>
 
         <maven-plugin-annotations.version>3.6.0</maven-plugin-annotations.version>
