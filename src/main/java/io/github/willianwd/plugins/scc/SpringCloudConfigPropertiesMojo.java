@@ -71,9 +71,9 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
                 {
                     final Yaml yaml = new Yaml();
                     final InputStream inputStream = new FileInputStream(projectYamlBootstrap);
-                    final Map<String, Object> yamlProperties = yaml.load(inputStream);
+                    final Map<String, Object> bootstrapYamlProperties = yaml.load(inputStream);
 
-                    final boolean sccEnabled = (Boolean) getPropertyOrNull(yamlProperties, SPRING_CLOUD_CONFIG_ENABLED_KEY);
+                    final boolean sccEnabled = (Boolean) getPropertyOrNull(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_ENABLED_KEY);
 
                     if (sccEnabled)
                     {
@@ -86,9 +86,9 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
 
                         final String sccUrl = String.format(
                             URL_TEMPLATE,
-                            getPropertyOrError(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY),
-                            getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY, SPRING_CLOUD_CONFIG_DEFAULT_LABEL),
-                            getApplicationName(yamlProperties),
+                            getPropertyOrError(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_URL_KEY),
+                            getPropertyOrDefault(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY, SPRING_CLOUD_CONFIG_DEFAULT_LABEL),
+                            getApplicationName(bootstrapYamlProperties),
                             profile
                         );
 
@@ -105,9 +105,12 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
                         }
 
                         final Map<String, Object> appProps = yaml.load(response.body());
-                        putPropertyIfAbsent(appProps, APPLICATION_NAME_KEY_2, getPropertyOrDefault(yamlProperties, APPLICATION_NAME_KEY_2, ""));
-                        putPropertyIfAbsent(appProps, SPRING_CLOUD_CONFIG_URL_KEY, getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
+                        putPropertyIfAbsent(appProps, APPLICATION_NAME_KEY_2, getPropertyOrDefault(bootstrapYamlProperties, APPLICATION_NAME_KEY_2, ""));
+                        putPropertyIfAbsent(appProps, SPRING_CLOUD_CONFIG_URL_KEY, getPropertyOrDefault(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
                         putPropertyIfAbsent(appProps, SPRING_CLOUD_CONFIG_ENABLED_KEY, sccEnabled);
+                        if (getPropertyOrNull(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY) != null) {
+                            putPropertyIfAbsent(appProps, SPRING_CLOUD_CONFIG_LABEL_KEY, getPropertyOrNull(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY));
+                        }
 
                         getLog().info("Writing properties from Spring Cloud Config into local file [" + targetDirectory + targetFile + "]");
 
