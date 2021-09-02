@@ -4,7 +4,7 @@
 
     <artifactId>quarkus-spring-cloud-config-maven-plugin</artifactId>
     <groupId>io.github.willianwd</groupId>
-    <version>1.1.4</version>
+    <version>1.1.5-SNAPSHOT</version>
 
     <name>Quarkus Spring Cloud Config Maven Plugin</name>
     <description>This plugin fetch properties from Spring Cloud Config to be used during build time</description>
@@ -15,7 +15,7 @@
         <connection>scm:git:https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin.git</connection>
         <developerConnection>scm:git:ssh://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin.git</developerConnection>
         <url>https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin</url>
-        <tag>quarkus-spring-cloud-config-maven-plugin-1.1.4</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <licenses>
