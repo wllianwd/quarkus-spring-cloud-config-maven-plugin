@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -18,6 +19,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 @Mojo(name = "fetch-properties", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
@@ -26,6 +28,9 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
 
     @Parameter(property = "skip")
     protected boolean skip = false;
+
+    @Parameter(property = "prettyDumperOptions")
+    protected boolean prettyDumperOptions = true;
 
     @Parameter(property = "bootstrapDirectory", defaultValue = "src/main/resources/")
     protected String bootstrapDirectory;
@@ -100,9 +105,9 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
                         }
 
                         final Map<String, Object> appProps = yaml.load(response.body());
-                        appProps.putIfAbsent(APPLICATION_NAME_KEY_2, getPropertyOrDefault(yamlProperties, APPLICATION_NAME_KEY_2, ""));
-                        appProps.putIfAbsent(SPRING_CLOUD_CONFIG_URL_KEY, getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
-                        appProps.putIfAbsent(SPRING_CLOUD_CONFIG_ENABLED_KEY, String.valueOf(sccEnabled));
+                        putPropertyIfAbsent(appProps, APPLICATION_NAME_KEY_2, getPropertyOrDefault(yamlProperties, APPLICATION_NAME_KEY_2, ""));
+                        putPropertyIfAbsent(appProps, SPRING_CLOUD_CONFIG_URL_KEY, getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
+                        putPropertyIfAbsent(appProps, SPRING_CLOUD_CONFIG_ENABLED_KEY, sccEnabled);
 
                         getLog().info("Writing properties from Spring Cloud Config into local file [" + targetDirectory + targetFile + "]");
 
@@ -114,7 +119,7 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
                         }
                         else if (targetFile.endsWith(".yml") || targetFile.endsWith(".yaml"))
                         {
-                            final Yaml yamlOutput = new Yaml();
+                            final Yaml yamlOutput = new Yaml(getDumperOptions());
                             yamlOutput.dump(appProps, new FileWriter(targetDirectory + targetFile));
                         }
                         else
@@ -220,6 +225,36 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
         {
             return map.get(key);
         }
+    }
+
+
+    public void putPropertyIfAbsent(final Map<String, Object> map, final String key, final Object value)
+    {
+        if (key.contains(PROPERTY_DELIMITER))
+        {
+            final String firstKey = key.substring(0, key.indexOf(PROPERTY_DELIMITER));
+            final String nextKey = key.substring(key.indexOf(PROPERTY_DELIMITER) + 1);
+            map.computeIfAbsent(firstKey, k -> new HashMap<String, Object>());
+            final Map<String, Object> nextValue = (Map<String, Object>) map.get(firstKey);
+            putPropertyIfAbsent(nextValue, nextKey, value);
+        }
+        else
+        {
+            map.putIfAbsent(key, value);
+        }
+    }
+
+
+    private DumperOptions getDumperOptions()
+    {
+        final DumperOptions options = new DumperOptions();
+        if (prettyDumperOptions)
+        {
+            options.setIndent(2);
+            options.setPrettyFlow(true);
+            options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        }
+        return options;
     }
 
 }

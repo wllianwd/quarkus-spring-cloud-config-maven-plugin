@@ -114,6 +114,8 @@ Those are all the properties from the plugin that can be defined in the `pom.xml
                 <targetFile>application.yml</targetFile>
                 <!-- the profile that will be used to call Spring Cloud Config -->
                 <profile>all</profile>
+                <!-- will apply pretty yaml options -->
+                <prettyDumperOptions>true</prettyDumperOptions>
             </configuration>
         </plugin>
     </plugins>
