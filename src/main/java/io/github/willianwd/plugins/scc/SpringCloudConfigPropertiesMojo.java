@@ -39,8 +39,11 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
     @Parameter(property = "bootstrapFile", defaultValue = "bootstrap.yml")
     protected String bootstrapFile;
 
+    @Parameter(property = "profile", defaultValue = "all")
+    protected String profile;
+
     private static final String SKIP_QUARKUS_SCCMP = "SKIP_QUARKUS_SCCMP";
-    private static final String URL_TEMPLATE = "%s/%s/%s-all.yaml";
+    private static final String URL_TEMPLATE = "%s/%s/%s-%s.yaml";
     private static final String PROPERTY_DELIMITER = ".";
     private static final String APPLICATION_NAME_KEY_1 = "quarkus.spring-cloud-config.name";
     private static final String APPLICATION_NAME_KEY_2 = "quarkus.application.name";
@@ -80,7 +83,8 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo
                             URL_TEMPLATE,
                             getPropertyOrError(yamlProperties, SPRING_CLOUD_CONFIG_URL_KEY),
                             getPropertyOrDefault(yamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY, SPRING_CLOUD_CONFIG_DEFAULT_LABEL),
-                            getApplicationName(yamlProperties)
+                            getApplicationName(yamlProperties),
+                            profile
                         );
 
                         getLog().info("Getting properties from Spring Cloud Config under URL [" + sccUrl + "]");
