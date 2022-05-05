@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.willianwd.plugins.scc.dto.PropertySource;
 import io.github.willianwd.plugins.scc.dto.ServiceProperties;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -112,17 +113,33 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo {
                         if (targetFile.endsWith(".properties")) {
                             final ServiceProperties serviceProperties = mapper.readValue(response.body(), ServiceProperties.class);
                             final Map<String, Object> appProps = new HashMap<>();
-                            serviceProperties.getPropertySources().forEach(propertySource -> appProps.putAll(propertySource.getSource()));
+                            final Map<String, Object> tempProps = new HashMap<>();
+                            serviceProperties.getPropertySources().forEach(propertySource -> tempProps.putAll(propertySource.getSource()));
                             appProps.putIfAbsent(APPLICATION_NAME_KEY_2, getRawPropertyOrDefault(bootstrapYamlProperties, APPLICATION_NAME_KEY_2, ""));
                             appProps.putIfAbsent(SPRING_CLOUD_CONFIG_URL_KEY, getRawPropertyOrDefault(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_URL_KEY, ""));
                             appProps.putIfAbsent(SPRING_CLOUD_CONFIG_ENABLED_KEY, sccEnabled);
                             if (getPropertyOrNull(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY) != null) {
                                 appProps.putIfAbsent(SPRING_CLOUD_CONFIG_LABEL_KEY, getPropertyOrNull(bootstrapYamlProperties, SPRING_CLOUD_CONFIG_LABEL_KEY));
                             }
-                            final PrintWriter pw = new PrintWriter(new FileWriter(targetDirectory + targetFile));
-                            appProps.forEach((key, value) -> {
-                                pw.write(key + "=" + value + "\n");
+                            tempProps.forEach((key, value) -> {
+                                if (!key.contains("\\${") && key.contains("${") && key.contains("}")) {
+                                    getLog().info("Key with placeholder found [" + key + "]");
+                                    final String rawPlaceholderOnKey = key.substring(key.indexOf("${"), key.indexOf("}") + 1);
+                                    final String placeholderOnKey = rawPlaceholderOnKey.replace("${", "").replace("}", "");
+                                    getLog().info("Placeholder key [" + placeholderOnKey + "] key [" + key + "]");
+                                    final Object placeholderOnKeyValue = tempProps.get(placeholderOnKey);
+                                    if (placeholderOnKeyValue instanceof String) {
+                                        appProps.put(key.replace(rawPlaceholderOnKey, (String) placeholderOnKeyValue), value);
+                                    } else {
+                                        appProps.put(key, value);
+                                    }
+                                    getLog().info("Found key [" + placeholderOnKey + "] value [" + placeholderOnKeyValue + "]");
+                                } else {
+                                    appProps.put(key, value);
+                                }
                             });
+                            final PrintWriter pw = new PrintWriter(new FileWriter(targetDirectory + targetFile));
+                            appProps.forEach((key, value) -> pw.write(key + "=" + value + "\n"));
                             pw.close();
                         } else if (targetFile.endsWith(".yml") || targetFile.endsWith(".yaml")) {
                             final Map<String, Object> appProps = yaml.load(response.body());
