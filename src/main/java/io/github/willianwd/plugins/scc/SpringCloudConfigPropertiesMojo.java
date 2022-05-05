@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.willianwd.plugins.scc.dto.PropertySource;
 import io.github.willianwd.plugins.scc.dto.ServiceProperties;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -123,17 +122,14 @@ public class SpringCloudConfigPropertiesMojo extends AbstractMojo {
                             }
                             tempProps.forEach((key, value) -> {
                                 if (!key.contains("\\${") && key.contains("${") && key.contains("}")) {
-                                    getLog().info("Key with placeholder found [" + key + "]");
                                     final String rawPlaceholderOnKey = key.substring(key.indexOf("${"), key.indexOf("}") + 1);
                                     final String placeholderOnKey = rawPlaceholderOnKey.replace("${", "").replace("}", "");
-                                    getLog().info("Placeholder key [" + placeholderOnKey + "] key [" + key + "]");
                                     final Object placeholderOnKeyValue = tempProps.get(placeholderOnKey);
                                     if (placeholderOnKeyValue instanceof String) {
                                         appProps.put(key.replace(rawPlaceholderOnKey, (String) placeholderOnKeyValue), value);
                                     } else {
                                         appProps.put(key, value);
                                     }
-                                    getLog().info("Found key [" + placeholderOnKey + "] value [" + placeholderOnKeyValue + "]");
                                 } else {
                                     appProps.put(key, value);
                                 }
