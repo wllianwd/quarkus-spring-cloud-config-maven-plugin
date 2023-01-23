@@ -1,7 +1,7 @@
 # Quarkus Spring Cloud Config Maven Plugin
 
-![Maven Central](https://img.shields.io/maven-central/v/io.github.willianwd/quarkus-spring-cloud-config-maven-plugin?logo=apache-maven&style=for-the-badge)
-![Release CI](https://img.shields.io/github/workflow/status/wllianwd/quarkus-spring-cloud-config-maven-plugin/ci-release?style=for-the-badge)
+![Maven Central](https://img.shields.io/maven-central/v/io.github.willianwd/quarkus-spring-cloud-config-maven-plugin?logo=apache-maven)
+![Release CI](https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin/actions/workflows/ci-release.yml/badge.svg)](https://github.com/wllianwd/quarkus-spring-cloud-config-maven-plugin/actions/workflows/ci-release.yml)
 
 In a nutshell this maven plugin will download the properties from Spring Cloud Config and generate an `application.yml` file inside `src/main/resources`, so this file can be used during build phase.
 It is recommended to use together with [spring cloud config client](https://quarkus.io/guides/spring-cloud-config-client).
