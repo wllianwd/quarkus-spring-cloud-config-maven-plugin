@@ -52,7 +52,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <maven.version>3.3.9</maven.version>
+        <maven.version>3.8.1</maven.version>
         <maven-project.version>2.2.1</maven-project.version>
         <junit.version>4.13.1</junit.version>
         <lombok.version>1.18.24</lombok.version>
